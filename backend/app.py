@@ -8,7 +8,7 @@ DATABASE_URL = os.getenv('DATABASE_URL')
 def get_db_connection():
     return psycopg2.connect(DATABASE_URL)
 
-# Добавляем путь для отображения фронтенда
+# ЭТОТ БЛОК ОТВЕЧАЕТ ЗА ТО, ЧТОБЫ САЙТ НЕ ПИСАЛ "NOT FOUND"
 @app.route('/')
 def index():
     return send_from_directory('../frontend', 'index.html')
@@ -26,19 +26,7 @@ def get_data():
     except:
         return jsonify([])
 
-@app.route('/api/data', methods=['POST'])
-def add_data():
-    new_item = request.json.get('name')
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute('INSERT INTO items (name) VALUES (%s)', (new_item,))
-    conn.commit()
-    cur.close()
-    conn.close()
-    return jsonify({"status": "added"}), 201
-
 if __name__ == '__main__':
-    # Инициализация таблицы при запуске
     try:
         conn = get_db_connection()
         cur = conn.cursor()
@@ -48,4 +36,4 @@ if __name__ == '__main__':
         conn.close()
     except:
         print("Waiting for DB...")
-    app.run(host='0.0.0.0', port=os.getenv('PORT', 5000))
+    app.run(host='0.0.0.0', port=int(os.getenv('PORT', 5000)))
