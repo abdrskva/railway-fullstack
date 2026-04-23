@@ -10,7 +10,6 @@ def get_db_connection():
 
 @app.route('/')
 def index():
-    # Указываем путь к папке frontend, которая находится на уровень выше
     return send_from_directory('../frontend', 'index.html')
 
 @app.route('/api/data', methods=['GET'])
@@ -26,25 +25,6 @@ def get_data():
     except:
         return jsonify([])
 
-@app.route('/api/data', methods=['POST'])
-def add_data():
-    new_item = request.json.get('name')
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute('INSERT INTO items (name) VALUES (%s)', (new_item,))
-    conn.commit()
-    cur.close()
-    conn.close()
-    return jsonify({"status": "added"}), 201
-
 if __name__ == '__main__':
-    try:
-        conn = get_db_connection()
-        cur = conn.cursor()
-        cur.execute('CREATE TABLE IF NOT EXISTS items (id serial PRIMARY KEY, name varchar(100));')
-        conn.commit()
-        cur.close()
-        conn.close()
-    except:
-        print("Waiting for DB...")
-    app.run(host='0.0.0.0', port=int(os.getenv('PORT', 5000)))
+    port = int(os.getenv('PORT', 8080))
+    app.run(host='0.0.0.0', port=port)
