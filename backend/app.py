@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request, send_from_directory
+from flask import Flask, jsonify, request, send_file
 import psycopg2
 import os
 
@@ -10,7 +10,8 @@ def get_db_connection():
 
 @app.route('/')
 def index():
-    return send_from_directory('../frontend', 'index.html')
+    # Теперь файл лежит в той же папке, что и app.py
+    return send_file('index.html')
 
 @app.route('/api/data', methods=['GET'])
 def get_data():
