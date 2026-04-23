@@ -8,9 +8,9 @@ DATABASE_URL = os.getenv('DATABASE_URL')
 def get_db_connection():
     return psycopg2.connect(DATABASE_URL)
 
-# ЭТОТ БЛОК ОТВЕЧАЕТ ЗА ТО, ЧТОБЫ САЙТ НЕ ПИСАЛ "NOT FOUND"
 @app.route('/')
 def index():
+    # Указываем путь к папке frontend, которая находится на уровень выше
     return send_from_directory('../frontend', 'index.html')
 
 @app.route('/api/data', methods=['GET'])
@@ -25,6 +25,17 @@ def get_data():
         return jsonify([{"id": i[0], "name": i[1]} for i in items])
     except:
         return jsonify([])
+
+@app.route('/api/data', methods=['POST'])
+def add_data():
+    new_item = request.json.get('name')
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute('INSERT INTO items (name) VALUES (%s)', (new_item,))
+    conn.commit()
+    cur.close()
+    conn.close()
+    return jsonify({"status": "added"}), 201
 
 if __name__ == '__main__':
     try:
