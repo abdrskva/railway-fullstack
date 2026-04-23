@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, send_from_directory
 import psycopg2
 import os
 
@@ -7,6 +7,11 @@ DATABASE_URL = os.getenv('DATABASE_URL')
 
 def get_db_connection():
     return psycopg2.connect(DATABASE_URL)
+
+# Добавляем путь для отображения фронтенда
+@app.route('/')
+def index():
+    return send_from_directory('../frontend', 'index.html')
 
 @app.route('/api/data', methods=['GET'])
 def get_data():
@@ -33,10 +38,14 @@ def add_data():
     return jsonify({"status": "added"}), 201
 
 if __name__ == '__main__':
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute('CREATE TABLE IF NOT EXISTS items (id serial PRIMARY KEY, name varchar(100));')
-    conn.commit()
-    cur.close()
-    conn.close()
-    app.run(host='0.0.0.0', port=5000)
+    # Инициализация таблицы при запуске
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute('CREATE TABLE IF NOT EXISTS items (id serial PRIMARY KEY, name varchar(100));')
+        conn.commit()
+        cur.close()
+        conn.close()
+    except:
+        print("Waiting for DB...")
+    app.run(host='0.0.0.0', port=os.getenv('PORT', 5000))
