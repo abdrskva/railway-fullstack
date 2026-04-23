@@ -10,7 +10,7 @@ def get_db_connection():
 
 @app.route('/')
 def index():
-    # Теперь файл лежит в той же папке, что и app.py
+    # Файл теперь лежит в той же директории /app
     return send_file('index.html')
 
 @app.route('/api/data', methods=['GET'])
@@ -27,5 +27,6 @@ def get_data():
         return jsonify([])
 
 if __name__ == '__main__':
+    # Используем порт 8080, который требует Railway в логах
     port = int(os.getenv('PORT', 8080))
     app.run(host='0.0.0.0', port=port)
